@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import getDog from "../api/Fetchers";
+import { MoonLoader } from "react-spinners";
 
 function Main() {
   const [dogImages, setDogImages] = useState<string[]>([]);
@@ -23,9 +24,11 @@ function Main() {
   const handleButton = async () => {
     setIsLoading(true);
     const dogImage = await getDog();
-    setDogImages((prevData) => [...prevData, ...dogImage]);
-    console.log(dogImages);
-    setIsLoading(false);
+    setTimeout(() => {
+      setDogImages((prevData) => [...prevData, ...dogImage]);
+      console.log(dogImages);
+      setIsLoading(false);
+    }, 300);
   };
 
   return (
@@ -37,7 +40,7 @@ function Main() {
             <ImageBox key={index} src={dog} alt="사진" />
           ))}
         </ImageContainer>
-        {isLoading && <div>로딩중입니다...</div>}
+        {isLoading && <MoonLoader color="#d68336" speedMultiplier={0.5} />}
         <StyledButton onClick={handleButton}>더 보기</StyledButton>
       </Container>
     </div>
