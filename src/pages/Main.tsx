@@ -4,6 +4,7 @@ import getDog from "../api/Fetchers";
 
 function Main() {
   const [dogImages, setDogImages] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const getDogImage = async () => {
@@ -20,9 +21,11 @@ function Main() {
   }, []);
 
   const handleButton = async () => {
+    setIsLoading(true);
     const dogImage = await getDog();
     setDogImages((prevData) => [...prevData, ...dogImage]);
     console.log(dogImages);
+    setIsLoading(false);
   };
 
   return (
@@ -34,6 +37,7 @@ function Main() {
             <ImageBox key={index} src={dog} alt="사진" />
           ))}
         </ImageContainer>
+        {isLoading && <div>로딩중입니다...</div>}
         <StyledButton onClick={handleButton}>더 보기</StyledButton>
       </Container>
     </div>
