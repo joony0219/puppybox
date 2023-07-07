@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import getDog from "../api/Fetchers";
+import { getDog, getDogFirst } from "../api/Fetchers";
 import { MoonLoader } from "react-spinners";
 
 function Main() {
@@ -10,7 +10,7 @@ function Main() {
   useEffect(() => {
     const getDogImage = async () => {
       try {
-        const dogImage = await getDog();
+        const dogImage = await getDogFirst();
         console.log(dogImage);
         setDogImages(dogImage);
       } catch (error) {
@@ -21,12 +21,25 @@ function Main() {
     getDogImage();
   }, []);
 
-  const handleButton = async () => {
+  const target = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(callback, options);
+    observer.observe(target.current);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const options = {
+    threshold: 0.8,
+  };
+
+  const callback = async () => {
     setIsLoading(true);
     const dogImage = await getDog();
     setTimeout(() => {
       setDogImages((prevData) => [...prevData, ...dogImage]);
-      console.log(dogImages);
       setIsLoading(false);
     }, 300);
   };
@@ -41,7 +54,7 @@ function Main() {
           ))}
         </ImageContainer>
         {isLoading && <MoonLoader color="#d68336" speedMultiplier={0.5} />}
-        <StyledButton onClick={handleButton}>더 보기</StyledButton>
+        <div ref={target} />
       </Container>
     </div>
   );
@@ -61,23 +74,6 @@ const Container = styled.div`
   border-radius: 8px;
   line-height: 1.5;
   border: 1px solid lightgray;
-`;
-
-const StyledButton = styled.button`
-  width: 120px;
-  padding: 6px 12px;
-  margin: 6px;
-  border-radius: 8px;
-  font-size: 1rem;
-  line-height: 1.5;
-  border: 1px solid lightgray;
-  color: gray;
-  background: white;
-  cursor: pointer;
-  &:hover {
-    background-color: skyblue;
-    color: blue;
-  }
 `;
 
 const ImageContainer = styled.div`
